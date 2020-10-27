@@ -5,12 +5,12 @@ Developer Notes
 **Table of Contents**
 
 - [Developer Notes](#developer-notes)
-    - [Coding Style (General)](#coding-style-general)
+  - [Coding Style (General)](#coding-style-general)
     - [Coding Style (C++)](#coding-style-c)
     - [Doxygen comments](#doxygen-comments)
     - [Coding Style (Python)](#coding-style-python)
     - [Development tips and tricks](#development-tips-and-tricks)
-        - [Compiling for debugging](#compiling-for-debugging)
+      - [Compiling for debugging](#compiling-for-debugging)
         - [Compiling for gprof profiling](#compiling-for-gprof-profiling)
         - [debug.log](#debuglog)
         - [Testnet and Regtest modes](#testnet-and-regtest-modes)
@@ -21,7 +21,7 @@ Developer Notes
     - [Threads](#threads)
     - [Ignoring IDE/editor files](#ignoring-ideeditor-files)
 - [Development guidelines](#development-guidelines)
-    - [General Bitcoin Core](#general-bitcoin-core)
+  - [General Bitcoin Core](#general-bitcoin-core)
     - [Wallet](#wallet)
     - [General C++](#general-c)
     - [C++ data structures](#c-data-structures)

@@ -18,7 +18,7 @@ filter_suffix() {
 EXIT_CODE=0
 
 for HEADER_FILE in $(filter_suffix h); do
-    DUPLICATE_INCLUDES_IN_HEADER_FILE=$(grep -E "^#include " < "${HEADER_FILE}" | sort | uniq -d)
+    DUPLICATE_INCLUDES_IN_HEADER_FILE=$(grep -E "^#include < < "${HEADER_FILE}> | sort | uniq -d)
     if [[ ${DUPLICATE_INCLUDES_IN_HEADER_FILE} != "" ]]; then
         echo "Duplicate include(s) in ${HEADER_FILE}:"
         echo "${DUPLICATE_INCLUDES_IN_HEADER_FILE}"
@@ -28,7 +28,7 @@ for HEADER_FILE in $(filter_suffix h); do
 done
 
 for CPP_FILE in $(filter_suffix cpp); do
-    DUPLICATE_INCLUDES_IN_CPP_FILE=$(grep -E "^#include " < "${CPP_FILE}" | sort | uniq -d)
+    DUPLICATE_INCLUDES_IN_CPP_FILE=$(grep -E "^#include < < "${CPP_FILE}> | sort | uniq -d)
     if [[ ${DUPLICATE_INCLUDES_IN_CPP_FILE} != "" ]]; then
         echo "Duplicate include(s) in ${CPP_FILE}:"
         echo "${DUPLICATE_INCLUDES_IN_CPP_FILE}"
@@ -105,7 +105,7 @@ for EXPECTED_BOOST_INCLUDE in "${EXPECTED_BOOST_INCLUDES[@]}"; do
     fi
 done
 
-QUOTE_SYNTAX_INCLUDES=$(git grep '^#include "' -- "*.cpp" "*.h" | grep -Ev "${IGNORE_REGEXP}")
+QUOTE_SYNTAX_INCLUDES=$(git grep '^#include <' -- "*.cpp" "*.h" | grep -Ev "${IGNORE_REGEXP}>)
 if [[ ${QUOTE_SYNTAX_INCLUDES} != "" ]]; then
     echo "Please use bracket syntax includes (\"#include <foo.h>\") instead of quote syntax includes:"
     echo "${QUOTE_SYNTAX_INCLUDES}"
