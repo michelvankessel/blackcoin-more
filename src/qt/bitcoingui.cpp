@@ -67,7 +67,7 @@ const std::string BitcoinGUI::DEFAULT_UIPLATFORM =
 #endif
         ;
 
-extern int64_t nLastCoinStakeSearchInterval;
+extern int64_t LastCoinStakeSearchInterval;
 double GetPoSKernelPS();
 
 BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *_platformStyle, const NetworkStyle *networkStyle, QWidget *parent) :

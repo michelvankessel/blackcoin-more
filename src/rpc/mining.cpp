@@ -35,8 +35,6 @@
 #include <memory>
 #include <stdint.h>
 
-#include <univalue.h>
-
 /**
  * Return average network hashes per second based on the last 'lookup' blocks,
  * or from the last difficulty change if 'lookup' is nonpositive.
@@ -84,7 +82,7 @@ static UniValue getnetworkhashps(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() > 2)
         throw std::runtime_error(
             "getnetworkhashps ( nblocks height )\n"
-            "\nReturns the estimated network hashes per second based on the last n blocks.\n"
+            "\nReturns the estimated network hashes per second based on the last n blocks (for PoW only).\n"
             "Pass in [blocks] to override # of blocks, -1 specifies since last difficulty change.\n"
             "Pass in [height] to estimate the network speed at the time when a certain block was found.\n"
             "\nArguments:\n"
@@ -106,6 +104,7 @@ UniValue generateBlocks(std::shared_ptr<CReserveScript> coinbaseScript, int nGen
     static const int nInnerLoopCount = 0x10000;
     int nHeightEnd = 0;
     int nHeight = 0;
+
     {   // Don't keep cs_main locked
         LOCK(cs_main);
         nHeight = chainActive.Height();
@@ -219,7 +218,7 @@ static UniValue getmininginfo(const JSONRPCRequest& request)
     return obj;
 }
 
-UniValue getstakinginfo(const JSONRPCRequest& request)
+static UniValue getstakinginfo(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0)
         throw std::runtime_error(
@@ -227,7 +226,8 @@ UniValue getstakinginfo(const JSONRPCRequest& request)
             "Returns an object containing staking-related information.");
 
     uint64_t nWeight = 0;
-    uint64_t lastCoinStakeSearchInterval = 0;
+    uint64_t LastCoinStakeSearchInterval = 0;
+    LOCK(cs_main);
 
 #ifdef ENABLE_WALLET
     std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
@@ -236,34 +236,32 @@ UniValue getstakinginfo(const JSONRPCRequest& request)
     if (pwallet)
     {
         nWeight = pwallet->GetStakeWeight();
-        lastCoinStakeSearchInterval = pwallet->m_last_coin_stake_search_interval;
+        LastCoinStakeSearchInterval = pwallet->m_last_coin_stake_search_interval;
     }
 #endif
 
     uint64_t nNetworkWeight = GetPoSKernelPS();
-    bool staking = lastCoinStakeSearchInterval && nWeight;
-
+    bool staking = LastCoinStakeSearchInterval && nWeight;
     const Consensus::Params& consensusParams = Params().GetConsensus();
     int64_t nTargetSpacing = consensusParams.nTargetSpacing;
     uint64_t nExpectedTime = staking ? 1.0455 * nTargetSpacing * nNetworkWeight / nWeight : 0;
 
     UniValue obj(UniValue::VOBJ);
 
-    obj.push_back(Pair("enabled", gArgs.GetBoolArg("-staking", true)));
-    obj.push_back(Pair("staking", staking));
-    obj.push_back(Pair("errors", GetWarnings("statusbar")));
+    obj.pushKV("enabled", gArgs.GetBoolArg("-staking", true));
+    obj.pushKV("staking", staking);
+    obj.pushKV("errors", GetWarnings("statusbar"));
 
-    obj.push_back(Pair("currentblocksize", (uint64_t)nLastBlockSize));
-    obj.push_back(Pair("currentblocktx", (uint64_t)nLastBlockTx));
-    obj.push_back(Pair("pooledtx", (uint64_t)mempool.size()));
+    obj.pushKV("currentblocktx", (uint64_t)nLastBlockTx);
+    obj.pushKV("pooledtx", (uint64_t)mempool.size());
 
-    obj.push_back(Pair("difficulty", GetDifficulty(GetLastBlockIndex(chainActive.Tip(), true))));
-    obj.push_back(Pair("search-interval", (int)nLastCoinStakeSearchInterval));
+    obj.pushKV("difficulty", GetDifficulty(GetLastBlockIndex(pindexBestHeader, true)));
+    obj.pushKV("search-interval", (int)LastCoinStakeSearchInterval);
 
-    obj.push_back(Pair("weight", (uint64_t)nWeight));
-    obj.push_back(Pair("netstakeweight", (uint64_t)nNetworkWeight));
+    obj.pushKV("weight", (uint64_t)nWeight);
+    obj.pushKV("netstakeweight", (uint64_t)nNetworkWeight);
 
-    obj.push_back(Pair("expectedtime", nExpectedTime));
+    obj.pushKV("expectedtime", nExpectedTime);
 
     return obj;
 }
