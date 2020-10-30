@@ -23,7 +23,6 @@ $(package)_config_opts += --disable-xv --disable-xvmc
 endef
 
 define $(package)_preprocess_cmds
-  cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub build-aux &&\
   sed "s/pthread-stubs//" -i configure
 endef
 
