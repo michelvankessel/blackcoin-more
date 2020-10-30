@@ -21,7 +21,7 @@ define $(package)_config_cmds
 endef
 
 define $(package)_build_cmds
-  $(MAKE) libz.a
+  $(MAKE) -j$(JOBS) libz.a
 endef
 
 define $(package)_stage_cmds

@@ -24,7 +24,7 @@ endef
 # for reproducible builds. So we just fallback on installing everything.
 define $(package)_stage_cmds
   DESTDIR=$($(package)_staging_dir) ninja genisoimage/install || \
-      DESTDIR=$($(package)_staging_dir) ninja install
+  DESTDIR=$($(package)_staging_dir) ninja install
 endef
 
 define $(package)_postprocess_cmds
