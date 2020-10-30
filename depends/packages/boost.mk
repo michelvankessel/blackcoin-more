@@ -21,7 +21,6 @@ $(package)_toolset_darwin=clang-darwin
 $(package)_config_libraries=chrono,filesystem,program_options,system,thread,test,random
 $(package)_cxxflags=-std=c++11 -fvisibility=hidden
 $(package)_cxxflags_linux=-fPIC
-$(package)_cxxflags_android=-fPIC
 endef
 
 define $(package)_preprocess_cmds
