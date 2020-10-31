@@ -1,9 +1,10 @@
-packages:=boost openssl libevent
+packages:=boost openssl libevent zeromq
+native_packages := native_ccache
 
 protobuf_native_packages = native_protobuf
 protobuf_packages = protobuf
 
-qt_packages = zlib
+qt_packages = qrencode protobuf zlib
 
 qrencode_packages = qrencode
 
