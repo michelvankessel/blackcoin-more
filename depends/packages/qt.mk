@@ -5,13 +5,12 @@ $(package)_suffix=opensource-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
 $(package)_sha256_hash=9b9dec1f67df1f94bce2955c5604de992d529dde72050239154c56352da0907d
 $(package)_dependencies=openssl zlib
-$(package)_linux_dependencies=freetype fontconfig libxcb
+$(package)_linux_dependencies=freetype fontconfig libxcb libX11 xproto libXext
 $(package)_build_subdir=qtbase
 $(package)_qt_libs=corelib network widgets gui plugins testlib
 $(package)_patches=fix_qt_pkgconfig.patch mac-qmake.conf fix_configure_mac.patch fix_no_printer.patch
-$(package)_patches+= fix_rcc_determinism.patch xkb-default.patch no-xlib.patch dont_hardcode_pwd.patch
-$(package)_patches+= drop_lrelease_dependency.patch
-
+$(package)_patches+= fix_rcc_determinism.patch fix_riscv64_arch.patch xkb-default.patch no-xlib.patch dont_hardcode_pwd.patch
+$(package)_patches+= freetype_back_compat.patch drop_lrelease_dependency.patch fix_powerpc_libpng.patch
 
 # Update OSX_QT_TRANSLATIONS when this is updated
 $(package)_qttranslations_file_name=qttranslations-$($(package)_suffix)
@@ -39,14 +38,11 @@ $(package)_config_opts += -no-freetype
 $(package)_config_opts += -no-gif
 $(package)_config_opts += -no-glib
 $(package)_config_opts += -no-icu
-$(package)_config_opts += -no-ico
 $(package)_config_opts += -no-iconv
 $(package)_config_opts += -no-kms
 $(package)_config_opts += -no-linuxfb
-$(package)_config_opts += -no-libjpeg
 $(package)_config_opts += -no-libudev
 $(package)_config_opts += -no-mtdev
-$(package)_config_opts += -no-opengl
 $(package)_config_opts += -no-openvg
 $(package)_config_opts += -no-reduce-relocations
 $(package)_config_opts += -no-qml-debug
@@ -70,45 +66,31 @@ $(package)_config_opts += -pch
 $(package)_config_opts += -pkg-config
 $(package)_config_opts += -prefix $(host_prefix)
 $(package)_config_opts += -qt-libpng
+$(package)_config_opts += -qt-libjpeg
 $(package)_config_opts += -qt-pcre
 $(package)_config_opts += -qt-harfbuzz
 $(package)_config_opts += -system-zlib
 $(package)_config_opts += -static
 $(package)_config_opts += -silent
 $(package)_config_opts += -v
-$(package)_config_opts += -no-feature-bearermanagement
-$(package)_config_opts += -no-feature-colordialog
-$(package)_config_opts += -no-feature-commandlineparser
-$(package)_config_opts += -no-feature-concurrent
 $(package)_config_opts += -no-feature-dial
-$(package)_config_opts += -no-feature-fontcombobox
 $(package)_config_opts += -no-feature-ftp
-$(package)_config_opts += -no-feature-image_heuristic_mask
-$(package)_config_opts += -no-feature-keysequenceedit
 $(package)_config_opts += -no-feature-lcdnumber
 $(package)_config_opts += -no-feature-pdf
-$(package)_config_opts += -no-feature-printdialog
 $(package)_config_opts += -no-feature-printer
-$(package)_config_opts += -no-feature-printpreviewdialog
-$(package)_config_opts += -no-feature-printpreviewwidget
-$(package)_config_opts += -no-feature-regularexpression
-$(package)_config_opts += -no-feature-sessionmanager
+$(package)_config_opts += -no-feature-printdialog
+$(package)_config_opts += -no-feature-concurrent
 $(package)_config_opts += -no-feature-sql
 $(package)_config_opts += -no-feature-statemachine
 $(package)_config_opts += -no-feature-syntaxhighlighter
 $(package)_config_opts += -no-feature-textbrowser
 $(package)_config_opts += -no-feature-textodfwriter
-$(package)_config_opts += -no-feature-topleveldomain
 $(package)_config_opts += -no-feature-udpsocket
-$(package)_config_opts += -no-feature-undocommand
-$(package)_config_opts += -no-feature-undogroup
-$(package)_config_opts += -no-feature-undostack
-$(package)_config_opts += -no-feature-undoview
-$(package)_config_opts += -no-feature-vnc
 $(package)_config_opts += -no-feature-wizard
 $(package)_config_opts += -no-feature-xml
 
 $(package)_config_opts_darwin = -no-dbus
+$(package)_config_opts_darwin += -no-opengl
 
 ifneq ($(build_os),darwin)
 $(package)_config_opts_darwin += -xplatform macx-clang-linux
@@ -121,16 +103,21 @@ endif
 
 $(package)_config_opts_linux  = -qt-xkbcommon-x11
 $(package)_config_opts_linux += -qt-xcb
-$(package)_config_opts_linux += -no-xcb-xlib
-$(package)_config_opts_linux += -no-feature-xlib
 $(package)_config_opts_linux += -system-freetype
+$(package)_config_opts_linux += -no-feature-sessionmanager
 $(package)_config_opts_linux += -fontconfig
-$(package)_config_opts_linux += -dbus-runtime
+$(package)_config_opts_linux += -no-opengl
 $(package)_config_opts_arm_linux += -platform linux-g++ -xplatform bitcoin-linux-g++
 $(package)_config_opts_i686_linux  = -xplatform linux-g++-32
 $(package)_config_opts_x86_64_linux = -xplatform linux-g++-64
 $(package)_config_opts_aarch64_linux = -xplatform linux-aarch64-gnu-g++
-$(package)_config_opts_mingw32 = -no-dbus
+$(package)_config_opts_powerpc64_linux = -platform linux-g++ -xplatform bitcoin-linux-g++
+$(package)_config_opts_powerpc64le_linux = -platform linux-g++ -xplatform bitcoin-linux-g++
+$(package)_config_opts_riscv64_linux = -platform linux-g++ -xplatform bitcoin-linux-g++
+$(package)_config_opts_s390x_linux = -platform linux-g++ -xplatform bitcoin-linux-g++
+
+$(package)_config_opts_mingw32 = -no-opengl
+$(package)_config_opts_mingw32 += -no-dbus
 $(package)_config_opts_mingw32 += -xplatform win32-g++
 $(package)_config_opts_mingw32 += -device-option CROSS_COMPILE="$(host)-"
 $(package)_build_env  = QT_RCC_TEST=1
@@ -158,6 +145,8 @@ define $(package)_extract_cmds
 endef
 
 define $(package)_preprocess_cmds
+  patch -p1 -i $($(package)_patch_dir)/freetype_back_compat.patch && \
+  patch -p1 -i $($(package)_patch_dir)/fix_powerpc_libpng.patch && \
   sed -i.old "s|updateqm.commands = \$$$$\$$$$LRELEASE|updateqm.commands = $($(package)_extract_dir)/qttools/bin/lrelease|" qttranslations/translations/translations.pro && \
   patch -p1 -i $($(package)_patch_dir)/drop_lrelease_dependency.patch && \
   patch -p1 -i $($(package)_patch_dir)/dont_hardcode_pwd.patch &&\
@@ -176,14 +165,16 @@ define $(package)_preprocess_cmds
   echo "!host_build: QMAKE_CFLAGS     += $($(package)_cflags) $($(package)_cppflags)" >> qtbase/mkspecs/common/gcc-base.conf && \
   echo "!host_build: QMAKE_CXXFLAGS   += $($(package)_cxxflags) $($(package)_cppflags)" >> qtbase/mkspecs/common/gcc-base.conf && \
   echo "!host_build: QMAKE_LFLAGS     += $($(package)_ldflags)" >> qtbase/mkspecs/common/gcc-base.conf && \
+  patch -p1 -i $($(package)_patch_dir)/fix_riscv64_arch.patch &&\
   patch -p1 -i $($(package)_patch_dir)/no-xlib.patch &&\
   echo "QMAKE_LINK_OBJECT_MAX = 10" >> qtbase/mkspecs/win32-g++/qmake.conf &&\
   echo "QMAKE_LINK_OBJECT_SCRIPT = object_script" >> qtbase/mkspecs/win32-g++/qmake.conf &&\
-  sed -i.old "s|QMAKE_CFLAGS            += |!host_build: QMAKE_CFLAGS            = $($(package)_cflags) $($(package)_cppflags) |" qtbase/mkspecs/win32-g++/qmake.conf && \
-  sed -i.old "s|QMAKE_CXXFLAGS          += |!host_build: QMAKE_CXXFLAGS            = $($(package)_cxxflags) $($(package)_cppflags) |" qtbase/mkspecs/win32-g++/qmake.conf && \
+  sed -i.old "s|QMAKE_CFLAGS           += |!host_build: QMAKE_CFLAGS            = $($(package)_cflags) $($(package)_cppflags) |" qtbase/mkspecs/win32-g++/qmake.conf && \
+  sed -i.old "s|QMAKE_CXXFLAGS         += |!host_build: QMAKE_CXXFLAGS            = $($(package)_cxxflags) $($(package)_cppflags) |" qtbase/mkspecs/win32-g++/qmake.conf && \
   sed -i.old "0,/^QMAKE_LFLAGS_/s|^QMAKE_LFLAGS_|!host_build: QMAKE_LFLAGS            = $($(package)_ldflags)\n&|" qtbase/mkspecs/win32-g++/qmake.conf && \
   sed -i.old "s|QMAKE_CC                = clang|QMAKE_CC                = $($(package)_cc)|" qtbase/mkspecs/common/clang.conf && \
-  sed -i.old "s|QMAKE_CXX               = clang++|QMAKE_CXX               = $($(package)_cxx)|" qtbase/mkspecs/common/clang.conf
+  sed -i.old "s|QMAKE_CXX               = clang++|QMAKE_CXX               = $($(package)_cxx)|" qtbase/mkspecs/common/clang.conf && \
+  sed -i.old "s/LIBRARY_PATH/(CROSS_)?\0/g" qtbase/mkspecs/features/toolchain.prf
 endef
 
 define $(package)_config_cmds
@@ -223,5 +214,6 @@ define $(package)_stage_cmds
 endef
 
 define $(package)_postprocess_cmds
-  rm -rf native/lib/ lib/lib*.la
+  rm -rf native/mkspecs/ native/lib/ lib/cmake/ && \
+  rm -f lib/lib*.la lib/*.prl plugins/*/*.prl
 endef
