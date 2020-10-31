@@ -141,6 +141,10 @@ multiprocess_packages_$(MULTIPROCESS) = $(multiprocess_packages)
 packages += $($(host_arch)_$(host_os)_packages) $($(host_os)_packages) $(qt_packages_) $(wallet_packages_) $(upnp_packages_)
 native_packages += $($(host_arch)_$(host_os)_native_packages) $($(host_os)_native_packages)
 
+ifneq ($(qt_packages_),)
+native_packages += $(qt_native_packages)
+endif
+
 ifneq ($(protobuf_packages_),)
 native_packages += $(protobuf_native_packages)
 packages += $(protobuf_packages)
