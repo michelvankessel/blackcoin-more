@@ -16,7 +16,7 @@ define $(package)_config_cmds
 endef
 
 define $(package)_build_cmds
-  ninja -j$(JOBS) genisoimage
+  $(MAKE) genisoimage
 endef
 
 # Older versions of cmake do not generate install target properly, but we

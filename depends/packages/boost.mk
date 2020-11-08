@@ -1,7 +1,7 @@
 package=boost
 $(package)_version=1_70_0
 $(package)_download_path=https://dl.bintray.com/boostorg/release/1.70.0/source/
-$(package)_file_name=$(package)_$($(package)_version).tar.bz2
+$(package)_file_name=boost_$($(package)_version).tar.bz2
 $(package)_sha256_hash=430ae8354789de4fd19ee52f3b1f739e1fba576f0aded0897c3c2bc00fb38778
 $(package)_patches=unused_var_in_process.patch
 
@@ -22,7 +22,7 @@ ifneq (,$(findstring clang,$($(package)_cxx)))
    $(package)_toolset_$(host_os)=clang
 endif
 $(package)_archiver_$(host_os)=$($(package)_ar)
-$(package)_config_libraries=chrono,atomic,program_options,date_time,filesystem,system,thread,test
+$(package)_config_libraries=chrono,filesystem,program_options,system,thread,test
 $(package)_cxxflags=-std=c++11 -fvisibility=hidden
 $(package)_cxxflags_linux=-fPIC
 endef
@@ -37,7 +37,7 @@ define $(package)_config_cmds
 endef
 
 define $(package)_build_cmds
-  ./b2 -d2 -j$(JOBS) -d1 --prefix=$($(package)_staging_prefix_dir) $($(package)_config_opts) toolset=$($(package)_toolset_$(host_os)) stage
+  ./b2 -d2 -j2 -d1 --prefix=$($(package)_staging_prefix_dir) $($(package)_config_opts) toolset=$($(package)_toolset_$(host_os)) stage
 endef
 
 define $(package)_stage_cmds

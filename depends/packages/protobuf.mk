@@ -21,7 +21,7 @@ define $(package)_config_cmds
 endef
 
 define $(package)_build_cmds
-  $(MAKE) -j$(JOBS) -C src libprotobuf.la
+  $(MAKE) -C src libprotobuf.la
 endef
 
 define $(package)_stage_cmds

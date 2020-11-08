@@ -60,8 +60,7 @@ $(package)_config_opts += -no-xinput2
 $(package)_config_opts += -nomake examples
 $(package)_config_opts += -nomake tests
 $(package)_config_opts += -opensource
-$(package)_config_opts += -openssl-linked
-$(package)_config_opts += -optimized-qmake
+$(package)_config_opts += -optimized-tools
 $(package)_config_opts += -pch
 $(package)_config_opts += -pkg-config
 $(package)_config_opts += -prefix $(host_prefix)
@@ -187,26 +186,21 @@ define $(package)_config_cmds
   $(MAKE) sub-src-clean && \
   cd ../qttranslations && ../qtbase/bin/qmake qttranslations.pro -o Makefile && \
   cd translations && ../../qtbase/bin/qmake translations.pro -o Makefile && cd ../.. && \
-  cd qttools/src/linguist && ../../../qtbase/bin/qmake linguist.pro -o Makefile && \
-  cd lconvert && ../../../../qtbase/bin/qmake lconvert.pro -o Makefile && cd .. && \
-  cd lrelease && ../../../../qtbase/bin/qmake lrelease.pro -o Makefile && cd .. && \
-  cd lupdate && ../../../../qtbase/bin/qmake lupdate.pro -o Makefile && cd ../../../..
+  cd qttools/src/linguist/lrelease/ && ../../../../qtbase/bin/qmake lrelease.pro -o Makefile && \
+  cd ../lupdate/ && ../../../../qtbase/bin/qmake lupdate.pro -o Makefile && cd ../../../..
 endef
 
 define $(package)_build_cmds
-  $(MAKE) -j$(JOBS) && \
-  $(MAKE) -j$(JOBS) -C ../qttools/src/linguist/lconvert && \
-  $(MAKE) -j$(JOBS) -C ../qttools/src/linguist/lrelease && \
-  $(MAKE) -j$(JOBS) -C ../qttools/src/linguist/lupdate && \
-  $(MAKE) -j$(JOBS) -C ../qttranslations
+  $(MAKE) -C src $(addprefix sub-,$($(package)_qt_libs)) && \
+  $(MAKE) -C ../qttools/src/linguist/lrelease && \
+  $(MAKE) -C ../qttools/src/linguist/lupdate && \
+  $(MAKE) -C ../qttranslations
 endef
 
 define $(package)_stage_cmds
-  $(MAKE) INSTALL_ROOT=$($(package)_staging_dir) install && cd .. && \
-  $(MAKE) -C qttools/src/linguist/lconvert INSTALL_ROOT=$($(package)_staging_dir) install && \
-  $(MAKE) -C qttools/src/linguist/lrelease INSTALL_ROOT=$($(package)_staging_dir) install && \
-  $(MAKE) -C qttools/src/linguist/lupdate INSTALL_ROOT=$($(package)_staging_dir) install && \
-  $(MAKE) -C qttools/src/linguist INSTALL_ROOT=$($(package)_staging_dir) install_cmake_linguist_tools_files && \
+  $(MAKE) -C src INSTALL_ROOT=$($(package)_staging_dir) $(addsuffix -install_subtargets,$(addprefix sub-,$($(package)_qt_libs))) && cd .. && \
+  $(MAKE) -C qttools/src/linguist/lrelease INSTALL_ROOT=$($(package)_staging_dir) install_target && \
+  $(MAKE) -C qttools/src/linguist/lupdate INSTALL_ROOT=$($(package)_staging_dir) install_target && \
   $(MAKE) -C qttranslations INSTALL_ROOT=$($(package)_staging_dir) install_subtargets && \
   if `test -f qtbase/src/plugins/platforms/xcb/xcb-static/libxcb-static.a`; then \
     cp qtbase/src/plugins/platforms/xcb/xcb-static/libxcb-static.a $($(package)_staging_prefix_dir)/lib; \

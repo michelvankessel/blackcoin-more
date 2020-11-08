@@ -15,7 +15,8 @@ define $(package)_set_vars
 endef
 
 define $(package)_preprocess_cmds
-  patch -p1 < $($(package)_patch_dir)/remove_libstd_link.patch
+  patch -p1 < $($(package)_patch_dir)/remove_libstd_link.patch && \
+  cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub config
 endef
 
 define $(package)_config_cmds
@@ -23,7 +24,7 @@ define $(package)_config_cmds
 endef
 
 define $(package)_build_cmds
-  $(MAKE) -j$(JOBS) src/libzmq.la
+  $(MAKE) src/libzmq.la
 endef
 
 define $(package)_stage_cmds
