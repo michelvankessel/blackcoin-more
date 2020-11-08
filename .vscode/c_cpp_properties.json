@@ -1,0 +1,35 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "U_FORTIFY_SOURCE",
+                "D_FORTIFY_SOURCE=2",
+                "DHAVE_BUILD_INFO",
+                "D__STDC_FORMAT_MACROS"
+            ],
+            "compilerPath": "/usr/bin/gcc-9",
+            "cStandard": "gnu89",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "gcc-x64",
+            "compilerArgs": [
+                "-pipe",
+                "-O2",
+                "-pthread",
+                "-Wl,-z,relro",
+                "-Wl,-z,now",
+                "-pie",
+                "-static-libstdc++",
+                "-m64",
+                "-std=c++11",
+                "-fstack-reuse=none",
+                "-Wstack-protector",
+                "-fstack-protector-all"
+            ]
+        }
+    ],
+    "version": 4
+}

@@ -139,8 +139,8 @@ libbitcoinconsensus.pc
 contrib/devtools/split-debug.sh
 
 #Visual Studio
-.vscode/*
-.vs/*
+#.vscode/*
+#.vs/*
 
 # clang-check
 *.plist
