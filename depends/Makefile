@@ -38,7 +38,6 @@ NO_QR ?=
 NO_WALLET ?=
 NO_ZMQ ?=
 NO_UPNP ?=
-MULTIPROCESS ?=
 FALLBACK_DOWNLOAD_PATH ?= https://bitcoincore.org/depends-sources
 
 BUILD = $(shell ./config.guess)
@@ -50,7 +49,6 @@ DOWNLOAD_CONNECT_TIMEOUT:=30
 DOWNLOAD_RETRIES:=3
 HOST_ID_SALT ?= salt
 BUILD_ID_SALT ?= salt
-JOBS ?= $(shell echo $$(($(shell nproc 2> /dev/null || sysctl -n hw.ncpu 2> /dev/null || echo 0) + 1)))
 
 host:=$(BUILD)
 ifneq ($(HOST),)
@@ -136,7 +134,6 @@ wallet_packages_$(NO_WALLET) = $(wallet_packages)
 upnp_packages_$(NO_UPNP) = $(upnp_packages)
 zmq_packages_$(NO_ZMQ) = $(zmq_packages)
 protobuf_packages_$(NO_PROTOBUF) = $(protobuf_packages)
-multiprocess_packages_$(MULTIPROCESS) = $(multiprocess_packages)
 
 packages += $($(host_arch)_$(host_os)_packages) $($(host_os)_packages) $(qt_packages_) $(wallet_packages_) $(upnp_packages_)
 native_packages += $($(host_arch)_$(host_os)_native_packages) $($(host_os)_native_packages)
@@ -152,11 +149,6 @@ endif
 
 ifneq ($(zmq_packages_),)
 packages += $(zmq_packages)
-endif
-
-ifeq ($(multiprocess_packages_),)
-packages += $(multiprocess_packages)
-native_packages += $(multiprocess_native_packages)
 endif
 
 all_packages = $(packages) $(native_packages)
@@ -205,7 +197,6 @@ $(host_prefix)/share/config.site : config.site.in $(host_prefix)/.stamp_$(final_
             -e 's|@no_zmq@|$(NO_ZMQ)|' \
             -e 's|@no_wallet@|$(NO_WALLET)|' \
             -e 's|@no_upnp@|$(NO_UPNP)|' \
-            -e 's|@multiprocess@|$(MULTIPROCESS)|' \
             -e 's|@debug@|$(DEBUG)|' \
             $< > $@
 	$(AT)touch $@
@@ -252,21 +243,6 @@ download-linux:
 download-win:
 	@$(MAKE) -s HOST=x86_64-w64-mingw32 download-one
 download: download-osx download-linux download-win
-
-build-linux64: download-linux
-	@$(MAKE) -s HOST=x86_64-linux-gnu install
-build-linux32: download-linux
-	@$(MAKE) -s HOST=i686-pc-linux-gnu install
-build-linux-arm: download-linux
-	@$(MAKE) -s HOST=arm-linux-gnueabihf install
-build-linux-aarch64: download-linux
-	@$(MAKE) -s HOST=aarch64-linux-gnu install
-build-osx: download-osx
-	@$(MAKE) -s HOST=x86_64-apple-darwin17 install
-build-win64: download-win
-	@$(MAKE) -s HOST=x86_64-w64-mingw32 install
-
-build-all: build-linux64 build-linux32 build-linux-arm build-linux-aarch64 build-osx build-win64
 
 $(foreach package,$(all_packages),$(eval $(call ext_add_stages,$(package))))
 
