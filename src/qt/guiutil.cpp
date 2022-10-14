@@ -782,7 +782,7 @@ boost::filesystem::path static GetAutostartFilePath()
     std::string chain = ChainNameFromCommandLine();
     if (chain == CBaseChainParams::MAIN)
         return GetAutostartDir() / "bitcoin.desktop";
-    return GetAutostartDir() / strprintf("bitcoin-%s.lnk", chain);
+    return GetAutostartDir() / strprintf("blackcoin-%s.lnk", chain);
 }
 
 bool GetStartOnSystemStartup()
