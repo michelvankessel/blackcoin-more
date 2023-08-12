@@ -106,6 +106,8 @@ const std::vector<std::string> CHECKLEVEL_DOC {
  * */
 static constexpr int PRUNE_LOCK_BUFFER{10};
 
+std::set<std::pair<COutPoint, unsigned int>> setStakeSeen;
+
 GlobalMutex g_best_block_mutex;
 std::condition_variable g_best_block_cv;
 uint256 g_best_block;
@@ -2143,6 +2145,12 @@ bool Chainstate::ConnectBlock(const CBlock& block, BlockValidationState& state, 
         return false; // do not error here as we expect this during initial block download
     }
 
+    // peercoin: check for duplicity of stake
+    if (block.IsProofOfStake() && setStakeSeen.count(std::make_pair(block.vtx[1]->vin[0].prevout, block.vtx[1]->nTime ? block.vtx[1]->nTime : block.nTime))) {
+            LogPrintf("WARNING: %s: duplicate proof-of-stake in block %s\n", __func__, block.GetHash().ToString());
+            return error("ConnectBlock(): Duplicate coinstake found!");
+    }
+
     num_blocks_total++;
 
     // Special case for the genesis block, skipping connection of its transactions
@@ -2432,6 +2440,13 @@ bool Chainstate::ConnectBlock(const CBlock& block, BlockValidationState& state, 
 
     // Set proof-of-stake hash modifier
     pindex->nStakeModifier = ComputeStakeModifier(pindex->pprev, block.IsProofOfStake() ? block.vtx[1]->vin[0].prevout.hash : block.GetHash());
+
+    // write everything to index
+    if (block.IsProofOfStake())
+    {
+        pindex->prevoutStake = block.vtx[1]->vin[0].prevout;
+        setStakeSeen.insert(std::make_pair(pindex->prevoutStake, pindex->nTime));
+    }
 
     if (fJustCheck)
         return true;

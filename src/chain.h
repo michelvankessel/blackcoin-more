@@ -222,8 +222,8 @@ public:
         BLOCK_STAKE_MODIFIER = (1 << 2),
     };
 
-    //! hash modifier of proof-of-stake
-    uint256 nStakeModifier{};
+    uint256 nStakeModifier{}; //! hash modifier of proof-of-stake
+    COutPoint prevoutStake{};
 
     bool IsProofOfWork() const
     {
@@ -461,6 +461,10 @@ public:
         // PoS fields
         READWRITE(obj.nFlags);
         READWRITE(obj.nStakeModifier);
+        if (obj.nFlags & BLOCK_PROOF_OF_STAKE)
+        {
+            READWRITE(obj.prevoutStake);
+        }
     }
 
     uint256 ConstructBlockHash() const

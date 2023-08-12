@@ -13,6 +13,7 @@
 #include <uint256.h>
 #include <util/translation.h>
 #include <util/vector.h>
+#include <validation.h>
 
 #include <stdint.h>
 
@@ -322,6 +323,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, 
                 // peercoin/blackcoin related block index fields
                 pindexNew->nFlags         = diskindex.nFlags;
                 pindexNew->nStakeModifier = diskindex.nStakeModifier;
+                pindexNew->prevoutStake   = diskindex.prevoutStake;
 
                 // Litecoin: Disable PoW Sanity check while loading block index from disk.
                 // We use the sha256 hash for the block index for performance reasons, which is recorded for later use.
@@ -335,6 +337,10 @@ bool CBlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, 
                         return error("%s: CheckProofOfWork failed: %s", __func__, pindexNew->ToString());
                 }
 				*/
+
+                // NovaCoin: build setStakeSeen
+                if (pindexNew->IsProofOfStake())
+                    setStakeSeen.insert(std::make_pair(pindexNew->prevoutStake, pindexNew->nTime));
 
                 pcursor->Next();
             } else {

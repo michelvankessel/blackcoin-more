@@ -109,6 +109,9 @@ extern uint256 g_best_block;
 /** Documentation for argument 'checklevel'. */
 extern const std::vector<std::string> CHECKLEVEL_DOC;
 
+/** The set of all seen COutPoint entries for proof of stake. */
+extern std::set<std::pair<COutPoint, unsigned int>> setStakeSeen;
+
 /** Run instances of script checking worker threads */
 void StartScriptCheckWorkerThreads(int threads_num);
 /** Stop all of the script checking worker threads */
