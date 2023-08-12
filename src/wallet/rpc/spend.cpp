@@ -313,6 +313,7 @@ RPCHelpMan burnwallet()
     std::shuffle(recipients.begin(), recipients.end(), FastRandomContext());
 
     // Send
+    // Blackcoin ToDo: fix fee calculation
     constexpr int RANDOM_CHANGE_POSITION = -1;
     auto res = CreateTransaction(*pwallet, recipients, RANDOM_CHANGE_POSITION, coin_control, true);
     if (!res) {
