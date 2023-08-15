@@ -246,8 +246,6 @@ RPCHelpMan burn()
 }
 
 // Blackcoin: burnwallet RPC
-// Blackcoin ToDo: fix fee calculation
-/*
 RPCHelpMan burnwallet()
 {
     return RPCHelpMan{"burnwallet",
@@ -306,14 +304,13 @@ RPCHelpMan burnwallet()
     }
 
     std::vector<CRecipient> recipients;
-    CRecipient recipient = {scriptPubKey, nAmount, false};
+    CRecipient recipient = {scriptPubKey, nAmount, true};
     recipients.push_back(recipient);
 
     // Shuffle recipient list
     std::shuffle(recipients.begin(), recipients.end(), FastRandomContext());
 
     // Send
-    // Blackcoin ToDo: fix fee calculation
     constexpr int RANDOM_CHANGE_POSITION = -1;
     auto res = CreateTransaction(*pwallet, recipients, RANDOM_CHANGE_POSITION, coin_control, true);
     if (!res) {
@@ -326,7 +323,7 @@ RPCHelpMan burnwallet()
 },
     };
 }
-*/
+
 
 RPCHelpMan sendtoaddress()
 {
