@@ -1877,8 +1877,9 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
 #ifdef ENABLE_WALLET
     if (node.wallet_loader->getWallets().size()) {
         bool fGenerate = gArgs.GetBoolArg("-staking", node::DEFAULT_STAKE);
-        walletTmp = std::shared_ptr<CWallet>(node.wallet_loader->getWallets()[0]->wallet());
-        node::MinePoS(fGenerate, walletTmp, node);
+        CWallet* pwallet = node.wallet_loader->getWallets()[0]->wallet();
+        if (pwallet)
+            node::MinePoS(fGenerate, pwallet, node);
     }
 #endif
 

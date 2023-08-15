@@ -220,7 +220,7 @@ int64_t UpdateTime(CBlock* pblock, const Consensus::Params& consensusParams, con
 void IncrementExtraNonce(CBlock* pblock, const CBlockIndex* pindexPrev, unsigned int& nExtraNonce);
 
 /** Mine proof-of-stake blocks */
-void MinePoS(bool fGenerate, std::shared_ptr<CWallet> pwallet, NodeContext& m_node);
+void MinePoS(bool fGenerate, CWallet* pwallet, NodeContext& m_node);
 bool EnableStaking();
 void InterruptStaking();
 void StopStaking();

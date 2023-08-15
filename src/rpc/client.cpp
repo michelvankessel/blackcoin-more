@@ -207,9 +207,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "addpeeraddress", 1, "port"},
     { "addpeeraddress", 2, "tried"},
     { "stop", 0, "wait" },
-    /*
     { "staking", 0, "generate"},
-    */
 };
 // clang-format on
 
