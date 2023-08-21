@@ -2149,9 +2149,16 @@ bool Chainstate::ConnectBlock(const CBlock& block, BlockValidationState& state, 
     }
 
     // peercoin: check for duplicity of stake
-    if (block.IsProofOfStake() && setStakeSeen.count(std::make_pair(block.vtx[1]->vin[0].prevout, block.vtx[1]->nTime ? block.vtx[1]->nTime : block.nTime))) {
+    if (block.IsProofOfStake()){
+        std::pair<COutPoint, unsigned int> proofOfStake = block.GetProofOfStake();
+        if (pindex->IsProofOfStake() && proofOfStake.first == pindex->prevoutStake) {
+            LogPrintf("WARNING: %s: duplicate proof-of-stake in block %s, invalidating tip\n", __func__, block.GetHash().ToString());
+            InvalidateBlock(state, pindex);
+            return error("ConnectBlock() : Duplicate coinstake found");
+        } else if (setStakeSeen.count(proofOfStake)) {
             LogPrintf("WARNING: %s: duplicate proof-of-stake in block %s\n", __func__, block.GetHash().ToString());
-            return error("ConnectBlock(): Duplicate coinstake found!");
+            return error("ConnectBlock() : Duplicate coinstake found");
+        }
     }
 
     num_blocks_total++;
@@ -2444,12 +2451,9 @@ bool Chainstate::ConnectBlock(const CBlock& block, BlockValidationState& state, 
     // Set proof-of-stake hash modifier
     pindex->nStakeModifier = ComputeStakeModifier(pindex->pprev, block.IsProofOfStake() ? block.vtx[1]->vin[0].prevout.hash : block.GetHash());
 
-    // write everything to index
+    // Set prevoutStake
     if (block.IsProofOfStake())
-    {
         pindex->prevoutStake = block.vtx[1]->vin[0].prevout;
-        setStakeSeen.insert(std::make_pair(pindex->prevoutStake, pindex->nTime));
-    }
 
     if (fJustCheck)
         return true;
