@@ -1058,6 +1058,8 @@ static RPCHelpMan submitheader()
 }
 
 // Blackcoin: staking RPC
+// Blackcoin ToDo: avoid segfault when running `staking false`
+/*
 static RPCHelpMan staking()
 {
     return RPCHelpMan{"staking",
@@ -1087,11 +1089,11 @@ static RPCHelpMan staking()
         NodeContext& node = EnsureAnyNodeContext(request.context);
 
         if (node.wallet_loader->getWallets().size()) {
-            if (fGenerate) {
-                CWallet* pwallet = node.wallet_loader->getWallets()[0]->wallet();
-                if (pwallet)
-                    node::MinePoS(fGenerate, pwallet, node);
-            } else {
+            std::shared_ptr<CWallet> tempWallet;
+            tempWallet = std::shared_ptr<CWallet>(node.wallet_loader->getWallets()[0]->wallet());
+            node::MinePoS(fGenerate, tempWallet, node);
+
+            if (!fGenerate) {
                 node::InterruptStaking();
                 node::StopStaking();
                 nLastCoinStakeSearchInterval = 0;
@@ -1106,6 +1108,7 @@ static RPCHelpMan staking()
 },
     };
 }
+*/
 
 // Blackcoin: checkkernel RPC
 // Blackcoin ToDo: check and fix if needed
@@ -1121,11 +1124,10 @@ static RPCHelpMan checkkernel()
                                 {
                                     {"txid", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "The transaction id"},
                                     {"vout", RPCArg::Type::NUM, RPCArg::Optional::NO, "The output number"},
-                                    {"sequence", RPCArg::Type::NUM, RPCArg::DefaultHint{"depends on the value of the 'locktime' argument"}, "The sequence number"},
-                                },
-                            },
+                            {"sequence", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "depends on the value of the 'locktime' argument", "The sequence number"},
+                                }},
                         },
-                        },
+                    },
                     {"createblocktemplate", RPCArg::Type::BOOL, RPCArg::Default{false}, "Create block template?"},
                 },
                 RPCResult{
@@ -1272,8 +1274,9 @@ void RegisterMiningRPCCommands(CRPCTable& t)
         {"hidden", &generatetodescriptor},
         {"hidden", &generateblock},
         {"hidden", &generate},
-        {"staking", &staking},
+
         /*
+        {"staking", &staking},
         {"staking", &checkkernel},
         */
     };

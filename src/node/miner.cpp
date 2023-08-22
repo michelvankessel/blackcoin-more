@@ -586,7 +586,7 @@ static bool ProcessBlockFound(const CBlock* pblock, NodeContext& m_node)
 }
 
 #ifdef ENABLE_WALLET
-void PoSMiner(CWallet* pwallet, NodeContext& m_node)
+void PoSMiner(std::shared_ptr<CWallet> pwallet, NodeContext& m_node)
 {
     CConnman* connman = m_node.connman.get();
     LogPrintf("PoSMiner started for proof-of-stake\n");
@@ -595,7 +595,7 @@ void PoSMiner(CWallet* pwallet, NodeContext& m_node)
     unsigned int nExtraNonce = 0;
 
     OutputType output_type = pwallet->m_default_change_type ? *pwallet->m_default_change_type : pwallet->m_default_address_type;
-    ReserveDestination reservedest(pwallet, output_type);
+    ReserveDestination reservedest(pwallet.get(), output_type);
     CTxDestination dest;
 
     // Compute timeout for pos as sqrt(numUTXO)
@@ -688,7 +688,7 @@ void PoSMiner(CWallet* pwallet, NodeContext& m_node)
             {
                 LOCK2(pwallet->cs_wallet, cs_main);
                 try {
-                    pblocktemplate = BlockAssembler{m_node.chainman->ActiveChainstate(), m_node.mempool.get()}.CreateNewBlock(scriptPubKey, pwallet, &fPoSCancel, &m_node);
+                    pblocktemplate = BlockAssembler{m_node.chainman->ActiveChainstate(), m_node.mempool.get()}.CreateNewBlock(scriptPubKey, pwallet.get(), &fPoSCancel, &m_node);
                 }
                 catch (const std::runtime_error &e)
                 {
@@ -747,7 +747,7 @@ void PoSMiner(CWallet* pwallet, NodeContext& m_node)
 }
 
 // peercoin: stake minter thread
-void static ThreadStakeMiner(CWallet* pwallet, NodeContext& m_node)
+void static ThreadStakeMiner(std::shared_ptr<CWallet> pwallet, NodeContext& m_node)
 {
     LogPrintf("ThreadStakeMiner started\n");
     while (true) {
@@ -765,7 +765,7 @@ void static ThreadStakeMiner(CWallet* pwallet, NodeContext& m_node)
 }
 
 // peercoin: stake minter
-void MinePoS(bool fGenerate, CWallet* pwallet, NodeContext& m_node)
+void MinePoS(bool fGenerate, std::shared_ptr<CWallet> pwallet, NodeContext& m_node)
 {
     if (!pwallet->GetKeyPoolSize()) {
         LogPrintf("Error: Keypool is empty, please make sure the wallet contains keys and call keypoolrefill before restarting the mining thread\n");
