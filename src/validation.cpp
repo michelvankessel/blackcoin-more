@@ -2151,11 +2151,14 @@ bool Chainstate::ConnectBlock(const CBlock& block, BlockValidationState& state, 
     // peercoin: check for duplicity of stake
     if (block.IsProofOfStake()){
         std::pair<COutPoint, unsigned int> proofOfStake = block.GetProofOfStake();
+        /*
         if (pindex->IsProofOfStake() && proofOfStake.first == pindex->prevoutStake) {
             LogPrintf("WARNING: %s: duplicate proof-of-stake in block %s, invalidating tip\n", __func__, block.GetHash().ToString());
             InvalidateBlock(state, pindex);
             return error("ConnectBlock() : Duplicate coinstake found");
-        } else if (setStakeSeen.count(proofOfStake)) {
+        } else 
+        */
+        if (setStakeSeen.count(proofOfStake)) {
             LogPrintf("WARNING: %s: duplicate proof-of-stake in block %s\n", __func__, block.GetHash().ToString());
             return error("ConnectBlock() : Duplicate coinstake found");
         }
