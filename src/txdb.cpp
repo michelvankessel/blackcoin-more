@@ -339,8 +339,8 @@ bool CBlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, 
 				*/
 
                 // NovaCoin: build setStakeSeen
-                //if (pindexNew->IsProofOfStake())
-                   // setStakeSeen.insert(std::make_pair(pindexNew->prevoutStake, pindexNew->nTime));
+                if (pindexNew->IsProofOfStake())
+                    setStakeSeen.insert(std::make_pair(pindexNew->prevoutStake, pindexNew->nTime));
 
                 pcursor->Next();
             } else {
