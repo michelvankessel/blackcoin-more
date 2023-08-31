@@ -2455,8 +2455,7 @@ bool Chainstate::ConnectBlock(const CBlock& block, BlockValidationState& state, 
     pindex->nStakeModifier = ComputeStakeModifier(pindex->pprev, block.IsProofOfStake() ? block.vtx[1]->vin[0].prevout.hash : block.GetHash());
 
     // Set prevoutStake
-    if (block.IsProofOfStake())
-        pindex->prevoutStake = block.vtx[1]->vin[0].prevout;
+    pindex->prevoutStake = block.vtx[1]->vin[0].prevout;
 
     if (fJustCheck)
         return true;
