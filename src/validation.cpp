@@ -2149,6 +2149,8 @@ bool Chainstate::ConnectBlock(const CBlock& block, BlockValidationState& state, 
     }
 
     // peercoin: check for duplicity of stake
+    // Blackcoin ToDo: enable the check
+    /*
     if (block.IsProofOfStake()){
         std::pair<COutPoint, unsigned int> proofOfStake = block.GetProofOfStake();
         if (pindex->IsProofOfStake() && proofOfStake.first == pindex->prevoutStake) {
@@ -2160,6 +2162,7 @@ bool Chainstate::ConnectBlock(const CBlock& block, BlockValidationState& state, 
             return error("ConnectBlock() : Duplicate coinstake found");
         }
     }
+    */
 
     num_blocks_total++;
 
