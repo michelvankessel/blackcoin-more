@@ -48,7 +48,6 @@ using wallet::COutput;
 using wallet::CCoinControl;
 using wallet::ReserveDestination;
 
-int64_t nLastCoinStakeSearchInterval = 0;
 std::thread m_minter_thread;
 
 namespace node {
@@ -245,7 +244,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
                     *pfPoSCancel = false;
                 }
             }
-            nLastCoinStakeSearchInterval = nSearchTime - nLastCoinStakeSearchTime;
+            pwallet->m_last_coin_stake_search_interval = nSearchTime - nLastCoinStakeSearchTime;
             nLastCoinStakeSearchTime = nSearchTime;
         }
         if (*pfPoSCancel)
@@ -613,10 +612,10 @@ void PoSMiner(std::shared_ptr<CWallet> pwallet, NodeContext& m_node)
         LogPrintf("Set proof-of-stake timeout: %ums for %u UTXOs\n", pos_timio, vCoins.size());
     }
 
-    std::string strMintMessage = _("Info: Staking suspended due to locked wallet.").translated;
-    std::string strMintSyncMessage = _("Info: Staking suspended while synchronizing wallet.").translated;
-    std::string strMintDisabledMessage = _("Info: Staking disabled by 'nominting' option.").translated;
-    std::string strMintBlockMessage = _("Info: Staking suspended due to block creation failure.").translated;
+    std::string strMintMessage = _("Info: Staking suspended due to locked wallet").translated;
+    std::string strMintSyncMessage = _("Info: Staking suspended while synchronizing wallet").translated;
+    std::string strMintDisabledMessage = _("Info: Staking disabled by 'nostaking' option").translated;
+    std::string strMintBlockMessage = _("Info: Staking suspended due to block creation failure").translated;
     std::string strMintEmpty = "";
     if (!gArgs.GetBoolArg("-staking", DEFAULT_STAKE))
     {
@@ -767,7 +766,7 @@ void static ThreadStakeMiner(std::shared_ptr<CWallet> pwallet, NodeContext& m_no
 // peercoin: stake minter
 void MinePoS(bool fGenerate, std::shared_ptr<CWallet> pwallet, NodeContext& m_node)
 {
-    if (!pwallet->GetKeyPoolSize()) {
+    if (!WITH_LOCK(pwallet->cs_wallet, return pwallet->GetKeyPoolSize())) {
         LogPrintf("Error: Keypool is empty, please make sure the wallet contains keys and call keypoolrefill before restarting the mining thread\n");
         fEnableStaking = false;
         return;
