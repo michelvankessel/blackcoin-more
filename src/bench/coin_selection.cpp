@@ -66,8 +66,10 @@ static void CoinSelection(benchmark::Bench& bench)
     FastRandomContext rand{};
     const CoinSelectionParams coin_selection_params{
         rand,
-        /*change_output_size=*/ 34,
-        /*change_spend_size=*/ 148,
+        /*change_output_size=*/ 0,
+        /*change_spend_size=*/ 0,
+        /*effective_feerate=*/ CFeeRate(0),
+        /*discard_feerate=*/ CFeeRate(0),
         /*tx_noinputs_size=*/ 0,
         /*avoid_partial=*/ false,
     };
